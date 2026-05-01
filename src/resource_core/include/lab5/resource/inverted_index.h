@@ -3,8 +3,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 namespace lab5::resource
 {
+
 class InvertedIndex
 {
   public:
@@ -18,4 +20,5 @@ class InvertedIndex
     std::unordered_map<int, Document> documents_;
     std::unordered_map<std::string, std::unordered_map<int, int>> invertedIndex_;
 };
+
 }
