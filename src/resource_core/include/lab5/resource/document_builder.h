@@ -6,7 +6,7 @@ namespace lab5::resource
 
 class DocumentBuilder
 {
-  public:
+public:
     DocumentBuilder& SetId(int id)
     {
         id_ = id;
@@ -27,7 +27,7 @@ class DocumentBuilder
         return Document(id_, std::move(name_), std::move(text_));
     }
 
-  private:
+private:
     int id_ = 0;
     std::string name_;
     std::string text_;

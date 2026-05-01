@@ -3,6 +3,7 @@
 #include <utility>
 namespace lab5::resource
 {
+
 class Document
 {
   public:
@@ -25,4 +26,5 @@ class Document
     std::string name_;
     std::string text_;
 };
+
 }
