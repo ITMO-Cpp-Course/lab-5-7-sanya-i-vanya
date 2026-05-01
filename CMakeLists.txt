@@ -37,7 +37,7 @@ if (ENABLE_SANITIZERS AND NOT WIN32)
     add_library(project_sanitizers INTERFACE
             src/resource_core/include/lab5/resource/inverted_index.h
             src/resource_core/include/lab5/resource/document_builder.h
-            src/resource_cli/src/main.cpp)
+    )
     target_compile_options(project_sanitizers INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer>)
     target_link_options(project_sanitizers INTERFACE    $<$<CONFIG:Debug>:-fsanitize=address>)
 endif ()
