@@ -27,4 +27,4 @@ class Document
     std::string text_;
 };
 
-}
+} // namespace lab5::resource
