@@ -6,9 +6,7 @@ namespace lab5::resource
 class Document
 {
   public:
-    Document(int id, std::string name, std::string text): id_(id), name_(std::move(name)), text_(std::move(text))
-    {
-    }
+    Document(int id, std::string name, std::string text) : id_(id), name_(std::move(name)), text_(std::move(text)) {}
     int GetId() const
     {
         return id_;

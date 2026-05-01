@@ -3,6 +3,7 @@
 #include <string>
 namespace lab5::resource
 {
+
 class DocumentBuilder
 {
   public:
@@ -31,4 +32,5 @@ class DocumentBuilder
     std::string name_;
     std::string text_;
 };
+
 }
