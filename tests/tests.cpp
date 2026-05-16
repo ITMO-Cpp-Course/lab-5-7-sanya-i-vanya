@@ -363,3 +363,39 @@ TEST_CASE("Overwrite existing document", "[inverted_index]")
         REQUIRE(index.GetWordCountInDocument("version", 555) == 1);
     }
 }
+TEST_CASE("Whitespace and newline handling", "[inverted_index]")
+{
+    InvertedIndex index;
+
+    Document doc = DocumentBuilder().SetId(11).SetText("word1   word2\tword3\nword4\r\nword5      word6").Build();
+
+    index.AddDocument(std::move(doc));
+
+    SECTION("All words should be found independently")
+    {
+        REQUIRE(index.GetWordCountInDocument("word1", 11) == 1);
+        REQUIRE(index.GetWordCountInDocument("word2", 11) == 1);
+        REQUIRE(index.GetWordCountInDocument("word3", 11) == 1);
+        REQUIRE(index.GetWordCountInDocument("word4", 11) == 1);
+        REQUIRE(index.GetWordCountInDocument("word5", 11) == 1);
+        REQUIRE(index.GetWordCountInDocument("word6", 11) == 1);
+    }
+}
+TEST_CASE("Search for empty or whitespace strings", "[inverted_index]")
+{
+    InvertedIndex index;
+    Document doc = DocumentBuilder().SetId(13).SetText("some text here").Build();
+    index.AddDocument(std::move(doc));
+
+    SECTION("Searching for empty string returns nothing")
+    {
+        REQUIRE(index.SearchWord("").empty());
+        REQUIRE(index.GetWordCountInDocument("", 13) == 0);
+    }
+
+    SECTION("Searching for space returns nothing")
+    {
+        REQUIRE(index.SearchWord(" ").empty());
+        REQUIRE(index.GetWordCountInDocument(" ", 13) == 0);
+    }
+}
