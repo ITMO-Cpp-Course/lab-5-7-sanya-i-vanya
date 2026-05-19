@@ -461,3 +461,4 @@ TEST_CASE("Text splitting by punctuation", "[index]")
         REQUIRE(index.SearchWord("anything").empty());
     }
 }
+//

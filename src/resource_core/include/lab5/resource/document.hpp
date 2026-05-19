@@ -28,3 +28,4 @@ class Document
 };
 
 } // namespace lab5::resource
+//

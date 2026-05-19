@@ -120,3 +120,4 @@ int InvertedIndex::GetWordCountInDocument(const std::string& word, int docId) co
     return docIt->second;
 }
 } // namespace lab5::resource
+//

@@ -34,3 +34,4 @@ class DocumentBuilder
 };
 
 } // namespace lab5::resource
+//

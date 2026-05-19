@@ -23,3 +23,4 @@ class InvertedIndex
 };
 
 } // namespace lab5::resource
+//
