@@ -1,6 +1,6 @@
 #pragma once
 
-#include "document.h"
+#include "document.hpp"
 
 #include <string>
 #include <unordered_map>
