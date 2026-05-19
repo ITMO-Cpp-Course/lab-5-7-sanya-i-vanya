@@ -1,7 +1,8 @@
-#include "../include/lab5/resource/inverted_index.h"
 #include <algorithm>
 #include <cctype>
+#include <lab5/resource/inverted_index.hpp>
 #include <sstream>
+#include <vector>
 namespace lab5::resource
 {
 static std::string normalizeWord(const std::string& word)
@@ -14,6 +15,43 @@ static std::string normalizeWord(const std::string& word)
     return result;
 }
 
+static bool isPunctuation(char ch)
+{
+    return ch == '.' || ch == ',' || ch == '!' || ch == '?' || ch == ';' || ch == ':' || ch == '"' || ch == '(' ||
+           ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}' || ch == '<' || ch == '>' || ch == '/' ||
+           ch == '|' || ch == '@' || ch == '#' || ch == '$' || ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
+           ch == '+' || ch == '=' || ch == '~' || ch == '`';
+}
+
+static std::vector<std::string> splitIntoWords(const std::string& text)
+{
+    std::vector<std::string> words;
+    std::string currentWord;
+
+    for (char ch : text)
+    {
+        if (std::isspace(static_cast<unsigned char>(ch)) || isPunctuation(ch))
+        {
+            if (!currentWord.empty())
+            {
+                words.push_back(currentWord);
+                currentWord.clear();
+            }
+        }
+        else
+        {
+            currentWord.push_back(ch);
+        }
+    }
+
+    if (!currentWord.empty())
+    {
+        words.push_back(currentWord);
+    }
+
+    return words;
+}
+
 void InvertedIndex::AddDocument(Document&& doc)
 {
     int docId = doc.GetId();
@@ -21,10 +59,9 @@ void InvertedIndex::AddDocument(Document&& doc)
     documents_.emplace(docId, std::move(doc));
     const Document& storedDoc = documents_.at(docId);
 
-    std::istringstream iss(storedDoc.GetText());
-    std::string rawWord;
+    std::vector<std::string> words = splitIntoWords(storedDoc.GetText());
 
-    while (iss >> rawWord)
+    for (const std::string& rawWord : words)
     {
         std::string word = normalizeWord(rawWord);
         invertedIndex_[word][docId]++;
@@ -33,10 +70,20 @@ void InvertedIndex::AddDocument(Document&& doc)
 
 void InvertedIndex::RemoveDocument(int docId)
 {
-    for (auto& [word, docMap] : invertedIndex_)
+    for (auto it = invertedIndex_.begin(); it != invertedIndex_.end();)
     {
-        docMap.erase(docId);
+        it->second.erase(docId);
+
+        if (it->second.empty())
+        {
+            it = invertedIndex_.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
+
     documents_.erase(docId);
 }
 
@@ -73,3 +120,4 @@ int InvertedIndex::GetWordCountInDocument(const std::string& word, int docId) co
     return docIt->second;
 }
 } // namespace lab5::resource
+//

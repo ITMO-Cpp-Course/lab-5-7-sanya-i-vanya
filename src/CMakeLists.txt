@@ -9,6 +9,7 @@ endif ()
 
 target_include_directories(resource_core
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource_core/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource_core/src
 )
 

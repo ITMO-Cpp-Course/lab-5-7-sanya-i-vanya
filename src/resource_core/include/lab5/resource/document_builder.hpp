@@ -1,5 +1,5 @@
 #pragma once
-#include "document.h"
+#include "document.hpp"
 #include <string>
 namespace lab5::resource
 {
@@ -34,3 +34,4 @@ class DocumentBuilder
 };
 
 } // namespace lab5::resource
+//

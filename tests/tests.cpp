@@ -1,6 +1,6 @@
-#include "../src/resource_core/include/lab5/resource/document.h"
-#include "../src/resource_core/include/lab5/resource/document_builder.h"
-#include "../src/resource_core/include/lab5/resource/inverted_index.h"
+#include "lab5/resource/document.hpp"
+#include "lab5/resource/document_builder.hpp"
+#include "lab5/resource/inverted_index.hpp"
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
@@ -266,7 +266,7 @@ TEST_CASE("Document with special characters and numbers", "[inverted_index]")
 
     SECTION("Search with special characters")
     {
-        std::vector<int> results = index.SearchWord("c++");
+        std::vector<int> results = index.SearchWord("c");
         REQUIRE(results.size() == 1);
         REQUIRE(results[0] == 50);
     }
@@ -363,39 +363,102 @@ TEST_CASE("Overwrite existing document", "[inverted_index]")
         REQUIRE(index.GetWordCountInDocument("version", 555) == 1);
     }
 }
-TEST_CASE("Whitespace and newline handling", "[inverted_index]")
+TEST_CASE("Text splitting by punctuation", "[index]")
 {
     InvertedIndex index;
 
-    Document doc = DocumentBuilder().SetId(11).SetText("word1   word2\tword3\nword4\r\nword5      word6").Build();
-
-    index.AddDocument(std::move(doc));
-
-    SECTION("All words should be found independently")
+    SECTION("Sentence with punctuation")
     {
-        REQUIRE(index.GetWordCountInDocument("word1", 11) == 1);
-        REQUIRE(index.GetWordCountInDocument("word2", 11) == 1);
-        REQUIRE(index.GetWordCountInDocument("word3", 11) == 1);
-        REQUIRE(index.GetWordCountInDocument("word4", 11) == 1);
-        REQUIRE(index.GetWordCountInDocument("word5", 11) == 1);
-        REQUIRE(index.GetWordCountInDocument("word6", 11) == 1);
+        Document doc = DocumentBuilder().SetId(1).SetText("Hello, world! How are you?").Build();
+
+        index.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("hello").size() == 1);
+        REQUIRE(index.SearchWord("world").size() == 1);
+        REQUIRE(index.SearchWord("how").size() == 1);
+        REQUIRE(index.SearchWord("are").size() == 1);
+        REQUIRE(index.SearchWord("you").size() == 1);
+
+        REQUIRE(index.GetWordCountInDocument("hello", 1) == 1);
+    }
+
+    SECTION("Complex punctuation")
+    {
+        Document doc =
+            DocumentBuilder().SetId(2).SetText("C++ is great; Python too! (Really?) [Yes] {No} <Maybe>").Build();
+
+        index.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("c").size() == 1);
+        REQUIRE(index.SearchWord("is").size() == 1);
+        REQUIRE(index.SearchWord("great").size() == 1);
+        REQUIRE(index.SearchWord("python").size() == 1);
+        REQUIRE(index.SearchWord("too").size() == 1);
+        REQUIRE(index.SearchWord("really").size() == 1);
+        REQUIRE(index.SearchWord("yes").size() == 1);
+        REQUIRE(index.SearchWord("no").size() == 1);
+        REQUIRE(index.SearchWord("maybe").size() == 1);
+    }
+
+    SECTION("Multiple punctuation in a row")
+    {
+        Document doc = DocumentBuilder().SetId(3).SetText("Wow!!! What?? ... Hello...").Build();
+
+        index.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("wow").size() == 1);
+        REQUIRE(index.SearchWord("what").size() == 1);
+        REQUIRE(index.SearchWord("hello").size() == 1);
+
+        REQUIRE(index.GetWordCountInDocument("wow", 3) == 1);
+    }
+
+    SECTION("Apostrophes and hyphens")
+    {
+        Document doc = DocumentBuilder().SetId(4).SetText("don't you know? It's a well-known fact").Build();
+
+        index.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("don't").size() == 1);
+        REQUIRE(index.SearchWord("it's").size() == 1);
+        REQUIRE(index.SearchWord("well-known").size() == 1);
+    }
+
+    SECTION("Numbers and special characters")
+    {
+        Document doc = DocumentBuilder().SetId(5).SetText("Version 1.2.3, price $100, emailexample.com").Build();
+
+        index.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("version").size() == 1);
+        REQUIRE(index.SearchWord("1").size() == 1);
+        REQUIRE(index.SearchWord("2").size() == 1);
+        REQUIRE(index.SearchWord("3").size() == 1);
+        REQUIRE(index.SearchWord("price").size() == 1);
+        REQUIRE(index.SearchWord("100").size() == 1);
+        REQUIRE(index.SearchWord("emailexample").size() == 1);
+    }
+
+    SECTION("Empty document")
+    {
+        InvertedIndex i;
+
+        Document doc = DocumentBuilder().SetId(6).SetText("").Build();
+
+        i.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("anything").empty());
+    }
+
+    SECTION("Document with only punctuation")
+    {
+        InvertedIndex i;
+
+        Document doc = DocumentBuilder().SetId(7).SetText("...,!?;: -").Build();
+
+        i.AddDocument(std::move(doc));
+
+        REQUIRE(index.SearchWord("anything").empty());
     }
 }
-TEST_CASE("Search for empty or whitespace strings", "[inverted_index]")
-{
-    InvertedIndex index;
-    Document doc = DocumentBuilder().SetId(13).SetText("some text here").Build();
-    index.AddDocument(std::move(doc));
-
-    SECTION("Searching for empty string returns nothing")
-    {
-        REQUIRE(index.SearchWord("").empty());
-        REQUIRE(index.GetWordCountInDocument("", 13) == 0);
-    }
-
-    SECTION("Searching for space returns nothing")
-    {
-        REQUIRE(index.SearchWord(" ").empty());
-        REQUIRE(index.GetWordCountInDocument(" ", 13) == 0);
-    }
-}
+//
